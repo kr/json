@@ -1,7 +1,5 @@
 #include "json.h"
 
-#include <stdio.h>
-
 #define nil ((void*)0)
 #define must(b) do { if (!(b)) return 0; } while (0)
 
