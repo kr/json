@@ -220,18 +220,7 @@ parseobject(Parser *p, JSON *parent)
 static int
 parsearray(Parser *p, JSON *parent)
 {
-	JSON *v = nil;
-	if (p->nj > 0) {
-		v = p->j;
-		p->j++;
-		p->nj--;
-	}
-
-	p->n++;
-	if (v) {
-		v->type = '[';
-		v->src = p->s;
-	}
+	JSON *v = inititem(p, parent, '[');
 	must(consume(p, "["));
 	skipws(p);
 	if (*p->s == ']') {
