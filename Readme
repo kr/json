@@ -1,5 +1,40 @@
-this is a json parser
-copy it into your code
+This is a parser for the JSON[1] data format, written in C.
+It's inspired by http://zserge.bitbucket.org/jsmn.html,
+but with a more streamlined interface. In other words,
+this parser doesn't do very much; it really only parses.
+Doesn't do any converting or creating of higher-level data
+structures for you.
 
-inspired by http://zserge.bitbucket.org/jsmn.html
-but with a more streamlined interface
+It's not much code (about 300 lines), and intended to be
+copied into your project. You need two files:
+
+	json.h
+	json.c
+
+
+How to use it (error handling omitted):
+
+	JSON *value;
+	int nvalue;
+
+	nvalue = jsonparse(src, len, NULL, 0); // 1. count values
+	value = calloc(nvalue, sizeof(JSON));  // 2. allocate them
+	jsonparse(src, len, value, nvalue);    // 3. parse them
+
+If you know beforehand how many values to expect, you can
+of course skip step 1 above.
+
+
+Tips for traversing the output data:
+
+ - The children of a JSON array form a linked list. The
+   first child of a JSON array at value[n] is at value[n+1],
+   and the second child is at value[n+1].next.
+
+ - The keys and values of a JSON object form two linked
+   lists. The first key and value in object at value[n] are
+   at value[n+1] and value[n+2], and the second ones are at
+   value[n+1].next and value[n+2].next.
+
+
+[1]: http://json.org

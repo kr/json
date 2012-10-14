@@ -12,7 +12,7 @@ struct Parser {
 	int  nj;
 };
 
-static int parsevalue(Parser*, JSON*);
+static int parsevalue(Parser*, JSON*, JSON**);
 
 
 static int
@@ -59,7 +59,7 @@ scanhex4(Parser *p)
 
 
 static JSON *
-inititem(Parser *p, JSON *parent, char type)
+inititem(Parser *p, JSON *parent, JSON **prev, char type)
 {
 	p->n++;
 	if (p->nj > 0) {
@@ -69,6 +69,12 @@ inititem(Parser *p, JSON *parent, char type)
 		v->type = type;
 		v->src = p->s;
 		v->parent = parent;
+		v->next = nil;
+		v->prev = *prev;
+		if (*prev) {
+			(*prev)->next = v;
+		}
+		*prev = v;
 		return v;
 	}
 	return nil;
@@ -76,9 +82,9 @@ inititem(Parser *p, JSON *parent, char type)
 
 
 static int
-parsenull(Parser *p, JSON *parent)
+parsenull(Parser *p, JSON *parent, JSON **prev)
 {
-	JSON *v = inititem(p, parent, 'n');
+	JSON *v = inititem(p, parent, prev, 'n');
 	must(consume(p, "null"));
 	if (v) {
 		v->end = p->s;
@@ -88,9 +94,9 @@ parsenull(Parser *p, JSON *parent)
 
 
 static int
-parsetrue(Parser *p, JSON *parent)
+parsetrue(Parser *p, JSON *parent, JSON **prev)
 {
-	JSON *v = inititem(p, parent, 't');
+	JSON *v = inititem(p, parent, prev, 't');
 	must(consume(p, "true"));
 	if (v) {
 		v->end = p->s;
@@ -100,9 +106,9 @@ parsetrue(Parser *p, JSON *parent)
 
 
 static int
-parsefalse(Parser *p, JSON *parent)
+parsefalse(Parser *p, JSON *parent, JSON **prev)
 {
-	JSON *v = inititem(p, parent, 'f');
+	JSON *v = inititem(p, parent, prev, 'f');
 	must(consume(p, "false"));
 	if (v) {
 		v->end = p->s;
@@ -112,9 +118,9 @@ parsefalse(Parser *p, JSON *parent)
 
 
 static int
-parsestring(Parser *p, JSON *parent)
+parsestring(Parser *p, JSON *parent, JSON **prev)
 {
-	JSON *v = inititem(p, parent, '"');
+	JSON *v = inititem(p, parent, prev, '"');
 	p->s++; // consume "
 	while (*p->s != '"') {
 		char c = *p->s;
@@ -141,10 +147,10 @@ parsestring(Parser *p, JSON *parent)
 
 
 static int
-parsenumber(Parser *p, JSON *parent)
+parsenumber(Parser *p, JSON *parent, JSON **prev)
 {
 	char c;
-	JSON *v = inititem(p, parent, '0');
+	JSON *v = inititem(p, parent, prev, '0');
 	if (*p->s == '-') {
 		p->s++;
 	}
@@ -176,22 +182,23 @@ parsenumber(Parser *p, JSON *parent)
 
 
 static int
-parsepair(Parser *p, JSON *parent)
+parsepair(Parser *p, JSON *parent, JSON **kprev, JSON **vprev)
 {
 	must(*p->s == '"');
-	must(parsestring(p, parent));
+	must(parsestring(p, parent, kprev));
 	skipws(p);
 	must(consume(p, ":"));
 	skipws(p);
-	must(parsevalue(p, parent));
+	must(parsevalue(p, parent, vprev));
 	return 1;
 }
 
 
 static int
-parseobject(Parser *p, JSON *parent)
+parseobject(Parser *p, JSON *parent, JSON **prev)
 {
-	JSON *v = inititem(p, parent, '{');
+	JSON *kprev = nil, *vprev = nil;
+	JSON *v = inititem(p, parent, prev, '{');
 	must(consume(p, "{"));
 	skipws(p);
 	if (*p->s == '}') {
@@ -202,11 +209,11 @@ parseobject(Parser *p, JSON *parent)
 		return 1;
 	}
 
-	must(parsepair(p, parent));
+	must(parsepair(p, parent, &kprev, &vprev));
 	for (skipws(p); *p->s == ','; skipws(p)) {
 		p->s++; // consume ,
 		skipws(p);
-		must(parsepair(p, parent));
+		must(parsepair(p, parent, &kprev, &vprev));
 	}
 
 	must(consume(p, "}"));
@@ -218,9 +225,9 @@ parseobject(Parser *p, JSON *parent)
 
 
 static int
-parsearray(Parser *p, JSON *parent)
+parsearray(Parser *p, JSON *parent, JSON **prev)
 {
-	JSON *v = inititem(p, parent, '[');
+	JSON *v = inititem(p, parent, prev, '[');
 	must(consume(p, "["));
 	skipws(p);
 	if (*p->s == ']') {
@@ -231,11 +238,12 @@ parsearray(Parser *p, JSON *parent)
 		return 1;
 	}
 
-	must(parsevalue(p, parent));
+	JSON *aprev = nil;
+	must(parsevalue(p, parent, &aprev));
 	for (skipws(p); *p->s == ','; skipws(p)) {
 		p->s++; // consume ,
 		skipws(p);
-		must(parsevalue(p, parent));
+		must(parsevalue(p, parent, &aprev));
 	}
 
 	must(consume(p, "]"));
@@ -247,19 +255,19 @@ parsearray(Parser *p, JSON *parent)
 
 
 static int
-parsevalue(Parser *p, JSON *parent)
+parsevalue(Parser *p, JSON *parent, JSON **prev)
 {
 	switch (*p->s) {
-	case '{': return parseobject(p, parent);
-	case '[': return parsearray(p, parent);
-	case '"': return parsestring(p, parent);
-	case 't': return parsetrue(p, parent);
-	case 'f': return parsefalse(p, parent);
-	case 'n': return parsenull(p, parent);
+	case '{': return parseobject(p, parent, prev);
+	case '[': return parsearray(p, parent, prev);
+	case '"': return parsestring(p, parent, prev);
+	case 't': return parsetrue(p, parent, prev);
+	case 'f': return parsefalse(p, parent, prev);
+	case 'n': return parsenull(p, parent, prev);
 	case '-':
 	case '0': case '1': case '2': case '3': case '4':
 	case '5': case '6': case '7': case '8': case '9':
-		return parsenumber(p, parent);
+		return parsenumber(p, parent, prev);
 	}
 	return 0;
 }
@@ -268,9 +276,10 @@ parsevalue(Parser *p, JSON *parent)
 static int
 parsetext(Parser *p)
 {
+	JSON *prev = nil;
 	switch (*p->s) {
-	case '{': return parseobject(p, nil);
-	case '[': return parsearray(p, nil);
+	case '{': return parseobject(p, nil, &prev);
+	case '[': return parsearray(p, nil, &prev);
 	}
 	return 0;
 }
