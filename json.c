@@ -50,9 +50,7 @@ scanhex4(Parser *p)
 {
 	for (int i = 0; i < 4; i++) {
 		char c = *p->s++;
-		if (!(('0'<=c && c<='9') || ('a'<=c && c<='f') || ('A'<=c && c<='F'))) {
-			return 0;
-		}
+		must(('0'<=c && c<='9') || ('a'<=c && c<='f') || ('A'<=c && c<='F'));
 	}
 	return 1;
 }
@@ -201,21 +199,14 @@ parseobject(Parser *p, JSON *parent, JSON **prev)
 	JSON *v = inititem(p, parent, prev, '{');
 	must(consume(p, "{"));
 	skipws(p);
-	if (*p->s == '}') {
-		p->s++;
-		if (v) {
-			v->end = p->s;
-		}
-		return 1;
-	}
-
-	must(parsepair(p, parent, &kprev, &vprev));
-	for (skipws(p); *p->s == ','; skipws(p)) {
-		p->s++; // consume ,
-		skipws(p);
+	if (*p->s != '}') {
 		must(parsepair(p, parent, &kprev, &vprev));
+		for (skipws(p); *p->s == ','; skipws(p)) {
+			p->s++; // consume ,
+			skipws(p);
+			must(parsepair(p, parent, &kprev, &vprev));
+		}
 	}
-
 	must(consume(p, "}"));
 	if (v) {
 		v->end = p->s;
@@ -230,22 +221,15 @@ parsearray(Parser *p, JSON *parent, JSON **prev)
 	JSON *v = inititem(p, parent, prev, '[');
 	must(consume(p, "["));
 	skipws(p);
-	if (*p->s == ']') {
-		p->s++;
-		if (v) {
-			v->end = p->s;
-		}
-		return 1;
-	}
-
-	JSON *aprev = nil;
-	must(parsevalue(p, parent, &aprev));
-	for (skipws(p); *p->s == ','; skipws(p)) {
-		p->s++; // consume ,
-		skipws(p);
+	if (*p->s != ']') {
+		JSON *aprev = nil;
 		must(parsevalue(p, parent, &aprev));
+		for (skipws(p); *p->s == ','; skipws(p)) {
+			p->s++; // consume ,
+			skipws(p);
+			must(parsevalue(p, parent, &aprev));
+		}
 	}
-
 	must(consume(p, "]"));
 	if (v) {
 		v->end = p->s;
