@@ -202,11 +202,11 @@ parseobject(Parser *p, JSON *parent, JSON **prev)
 	must(consume(p, "{"));
 	skipws(p);
 	if (*p->s != '}') {
-		must(parsepair(p, parent, &kprev, &vprev));
+		must(parsepair(p, v, &kprev, &vprev));
 		for (skipws(p); *p->s == ','; skipws(p)) {
 			p->s++; // consume ,
 			skipws(p);
-			must(parsepair(p, parent, &kprev, &vprev));
+			must(parsepair(p, v, &kprev, &vprev));
 		}
 	}
 	must(consume(p, "}"));
@@ -225,11 +225,11 @@ parsearray(Parser *p, JSON *parent, JSON **prev)
 	skipws(p);
 	if (*p->s != ']') {
 		JSON *aprev = nil;
-		must(parsevalue(p, parent, &aprev));
+		must(parsevalue(p, v, &aprev));
 		for (skipws(p); *p->s == ','; skipws(p)) {
 			p->s++; // consume ,
 			skipws(p);
-			must(parsevalue(p, parent, &aprev));
+			must(parsevalue(p, v, &aprev));
 		}
 	}
 	must(consume(p, "]"));

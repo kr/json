@@ -174,6 +174,34 @@ cttestparse()
 
 
 void
+cttestarrayparent()
+{
+	Valid t = {"[1]", 2, {
+		{'[', 3, "[1]"},
+		{'[', 1, "[]"},
+	}};
+	jsonparse(t.src, x, 100);
+	assertf(x[0].parent == nil, "x[1].parent = %p want nil", x[0].parent);
+	assertf(x[1].parent == &x[0], "x[1].parent = %p want %p", x[1].parent, &x[0]);
+}
+
+
+void
+cttestobjectparent()
+{
+	Valid t = {"{\"a\":1}", 3, {
+		{'[', 8, "{\"a\":1}"},
+		{'[', 3, "\"a\""},
+		{'[', 1, "1"},
+	}};
+	jsonparse(t.src, x, 100);
+	assertf(x[0].parent == nil, "x[1].parent = %p want nil", x[0].parent);
+	assertf(x[1].parent == &x[0], "x[1].parent = %p want %p", x[1].parent, &x[0]);
+	assertf(x[2].parent == &x[0], "x[2].parent = %p want %p", x[2].parent, &x[0]);
+}
+
+
+void
 cttestinvalid()
 {
 	int i;
