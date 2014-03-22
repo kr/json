@@ -171,6 +171,7 @@ parsenumber(Parser *p, JSON *parent, JSON **prev)
 		if (*p->s == '+' || *p->s == '-') {
 			p->s++;
 		}
+		must('0' <= *p->s && *p->s <= '9');
 		scandigits(p);
 	}
 	if (v) {
