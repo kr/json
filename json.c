@@ -30,7 +30,7 @@ consume(Parser *p, char *s)
 static void
 skipws(Parser *p)
 {
-	while (*p->s == ' ' || *p->s == '\n') {
+	while (*p->s == ' ' || *p->s == '\t' || *p->s == '\n' || *p->s == '\r') {
 		p->s++;
 	}
 }
