@@ -17,9 +17,9 @@ How to use it (error handling omitted):
 	JSON *value;
 	int nvalue;
 
-	nvalue = jsonparse(src, len, NULL, 0); // 1. count values
-	value = calloc(nvalue, sizeof(JSON));  // 2. allocate them
-	jsonparse(src, len, value, nvalue);    // 3. parse them
+	nvalue = jsonparse(src, NULL, 0);     // 1. count values
+	value = calloc(nvalue, sizeof(JSON)); // 2. allocate them
+	jsonparse(src, value, nvalue);        // 3. parse them
 
 If you know beforehand how many values to expect, you can
 of course skip step 1 above.
