@@ -141,8 +141,7 @@ cttestcount()
 
 		v = valid[i];
 		r = jsonparse(v.src, nil, 0);
-		ctlog("valid %d: «%s»", i, v.src);
-		assertf(r == v.n, "r is %d, exp %d", r, v.n);
+		assertf(r == v.n, "jsonparse(%s) = %d want %d", v.src, r, v.n);
 	}
 }
 
@@ -157,15 +156,13 @@ cttestparse()
 
 		v = valid[i];
 		r = jsonparse(v.src, x, 100);
-		ctlog("valid %d: «%s»", i, v.src);
 		assertf(r == v.n, "r is %d, exp %d", r, v.n);
 		for (j = 0; j < r; j++) {
 			JSON exp = v.parts[j], got = x[j];
 			assert(exp.len == strlen(exp.src)); // sanity check test data
-			assertf(got.type == exp.type, "part %d: '%c' != '%c'", j, got.type, exp.type);
-			assertf(got.len == exp.len, "part %d: %d != %d", j, got.len, exp.len);
-			assertf(strncmp(got.src, exp.src, got.len) == 0, "part %d: got %*s", j, got.len, got.src);
-			assertf(got.end == got.src + got.len, "part %d", j);
+			assertf(got.type == exp.type, "part[%d].type = '%c' want '%c'", j, got.type, exp.type);
+			assertf(strncmp(got.src, exp.src, got.len) == 0, "part[%d].src = %.*s want %s", j, got.len, got.src, exp.src);
+			assertf(got.end == got.src + got.len, "part[%d]", j);
 		}
 	}
 }
@@ -177,8 +174,7 @@ cttestinvalid()
 	int i;
 
 	for (i = 0; invalid[i]; i++) {
-		ctlog("invalid %d: «%s»", i, invalid[i]);
 		r = jsonparse(invalid[i], nil, 0);
-		assertf(r == 0, "r is %d, invalid %d", r, i);
+		assertf(r == 0, "jsonparse(%s) = %d want 0", invalid[i], r);
 	}
 }
