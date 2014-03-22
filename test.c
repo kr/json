@@ -174,30 +174,36 @@ cttestparse()
 
 
 void
-cttestarrayparent()
+cttestarraypointers()
 {
-	Valid t = {"[1]", 2, {
-		{'[', 3, "[1]"},
-		{'[', 1, "[]"},
-	}};
-	jsonparse(t.src, x, 100);
+	jsonparse("[1,2]", x, 100);
 	assertf(x[0].parent == nil, "x[1].parent = %p want nil", x[0].parent);
 	assertf(x[1].parent == &x[0], "x[1].parent = %p want %p", x[1].parent, &x[0]);
+	assertf(x[2].parent == &x[0], "x[2].parent = %p want %p", x[2].parent, &x[0]);
+	assertf(x[1].prev == nil, "x[1].prev = %p want nil", x[1].prev);
+	assertf(x[1].next == &x[2], "x[1].next = %p want %p", x[1].next, &x[2]);
+	assertf(x[2].prev == &x[1], "x[2].prev = %p want %p", x[2].prev, &x[1]);
+	assertf(x[2].next == nil, "x[2].next = %p want nil", x[2].next);
 }
 
 
 void
-cttestobjectparent()
+cttestobjectpointers()
 {
-	Valid t = {"{\"a\":1}", 3, {
-		{'[', 8, "{\"a\":1}"},
-		{'[', 3, "\"a\""},
-		{'[', 1, "1"},
-	}};
-	jsonparse(t.src, x, 100);
+	jsonparse("{\"a\":1,\"b\":2}", x, 100);
 	assertf(x[0].parent == nil, "x[1].parent = %p want nil", x[0].parent);
 	assertf(x[1].parent == &x[0], "x[1].parent = %p want %p", x[1].parent, &x[0]);
 	assertf(x[2].parent == &x[0], "x[2].parent = %p want %p", x[2].parent, &x[0]);
+	assertf(x[3].parent == &x[0], "x[3].parent = %p want %p", x[3].parent, &x[0]);
+	assertf(x[4].parent == &x[0], "x[4].parent = %p want %p", x[4].parent, &x[0]);
+	assertf(x[1].prev == nil, "x[1].prev = %p want nil", x[1].prev);
+	assertf(x[1].next == &x[3], "x[1].next = %p want %p", x[1].next, &x[3]);
+	assertf(x[3].prev == &x[1], "x[3].prev = %p want %p", x[3].prev, &x[1]);
+	assertf(x[3].next == nil, "x[3].next = %p want nil", x[3].next);
+	assertf(x[2].prev == nil, "x[2].prev = %p want nil", x[2].prev);
+	assertf(x[2].next == &x[4], "x[2].next = %p want %p", x[2].next, &x[4]);
+	assertf(x[4].prev == &x[2], "x[4].prev = %p want %p", x[4].prev, &x[2]);
+	assertf(x[4].next == nil, "x[4].next = %p want nil", x[4].next);
 }
 
 
