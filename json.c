@@ -80,34 +80,10 @@ inititem(Parser *p, JSON *parent, JSON **prev, char type)
 
 
 static int
-parsenull(Parser *p, JSON *parent, JSON **prev)
+parseword(Parser *p, JSON *parent, JSON **prev, char *lit)
 {
-	JSON *v = inititem(p, parent, prev, 'n');
-	must(consume(p, "null"));
-	if (v) {
-		v->end = p->s;
-	}
-	return 1;
-}
-
-
-static int
-parsetrue(Parser *p, JSON *parent, JSON **prev)
-{
-	JSON *v = inititem(p, parent, prev, 't');
-	must(consume(p, "true"));
-	if (v) {
-		v->end = p->s;
-	}
-	return 1;
-}
-
-
-static int
-parsefalse(Parser *p, JSON *parent, JSON **prev)
-{
-	JSON *v = inititem(p, parent, prev, 'f');
-	must(consume(p, "false"));
+	JSON *v = inititem(p, parent, prev, lit[0]);
+	must(consume(p, lit));
 	if (v) {
 		v->end = p->s;
 	}
@@ -247,9 +223,9 @@ parsevalue(Parser *p, JSON *parent, JSON **prev)
 	case '{': return parseobject(p, parent, prev);
 	case '[': return parsearray(p, parent, prev);
 	case '"': return parsestring(p, parent, prev);
-	case 't': return parsetrue(p, parent, prev);
-	case 'f': return parsefalse(p, parent, prev);
-	case 'n': return parsenull(p, parent, prev);
+	case 't': return parseword(p, parent, prev, "true");
+	case 'f': return parseword(p, parent, prev, "false");
+	case 'n': return parseword(p, parent, prev, "null");
 	case '-':
 	case '0': case '1': case '2': case '3': case '4':
 	case '5': case '6': case '7': case '8': case '9':
