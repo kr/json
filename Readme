@@ -5,14 +5,14 @@ this parser doesn't do very much; it really only parses.
 Doesn't do any converting or creating of higher-level data
 structures for you.
 
-It's not much code (about 300 lines), and intended to be
-copied into your project. You need two files:
+To install, run
 
-	json.h
-	json.c
+	make install
+
+To use it, #include <json.h> in your C program.
 
 
-How to use it (error handling omitted):
+Example (error handling omitted):
 
 	JSON *value;
 	int nvalue;
