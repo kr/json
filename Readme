@@ -1,40 +1,75 @@
-This is a parser for the JSON[1] data format, written in C.
-It's inspired by http://zserge.bitbucket.org/jsmn.html,
-but with a more streamlined interface. In other words,
-this parser doesn't do very much; it really only parses.
+libjson
+
+This is a C library for parsing the JSON[1] data format.
+This parser doesn't do very much; it really only parses.
 Doesn't do any converting or creating of higher-level data
 structures for you.
 
-To install, run
-
-	make install
-
-To use it, #include <json.h> in your C program.
+It has no dependencies. It only defines one type and one
+function. It does no allocation. Its source code is
+about 275 lines.
 
 
-Example (error handling omitted):
+# Building
 
-	JSON *value;
-	int nvalue;
-
-	nvalue = jsonparse(src, NULL, 0);     // 1. count values
-	value = calloc(nvalue, sizeof(JSON)); // 2. allocate them
-	jsonparse(src, value, nvalue);        // 3. parse them
-
-If you know beforehand how many values to expect, you can
-of course skip step 1 above.
+To build and test, run make. You can run 'make install'
+to copy json.h and libjson.a to the appropriate places
+in /usr/local. Then you should be able to compile with
+#include <json.h> and link with -ljson in your programs
+that use it.
 
 
-Tips for traversing the output data:
+# Example
 
- - The children of a JSON array form a linked list. The
-   first child of a JSON array at value[n] is at value[n+1],
-   and the second child is at value[n+1].next.
+JSON val[100];
+int n, i;
 
- - The keys and values of a JSON object form two linked
-   lists. The first key and value in object at value[n] are
-   at value[n+1] and value[n+2], and the second ones are at
-   value[n+1].next and value[n+2].next.
+n = jsonparse(src, val, 100);
+if (n > 100)
+	errx(1, "too many values");
+for (i=0; i<n; i++)
+	printf("%.*s;\n", val[i].len, val[i].src);
 
+
+# Reference
+
+int jsonparse(char *src, JSON *val, int nval);
+
+	Scan a JSON text in src and find the lexical bounds of
+	the values that appear. Writes at most nval entries into
+	array val. Values are written in the order they occur in
+	src, so the outermost object or array will be in val[0].
+
+	Returns the total number of values in src (regardless of
+	nval). If src is not well-formed JSON, returns 0.
+	Ignores trailing garbage.
+
+typedef struct JSON JSON;
+struct JSON {
+	char type; // one of: { [ " 0 t f n
+	int  len;
+	char *src;
+	char *end; // src + len
+	JSON *parent;
+	JSON *next;
+	JSON *prev;
+};
+
+	Represents a JSON value by pointing to the lexical
+	bounds of its occurrence in the JSON text.
+
+	The children of a JSON array form a linked list. The
+	first child of a JSON array at val[n] is at val[n+1],
+	and the second child is at val[n+1].next.
+
+	The keys and values of a JSON object form two linked
+	lists. The first key and val in object at val[n] are
+	at val[n+1] and val[n+2], and the second ones are at
+	val[n+1].next and val[n+2].next.
+
+
+# Similar Work
+
+http://zserge.bitbucket.org/jsmn.html
 
 [1]: http://json.org
