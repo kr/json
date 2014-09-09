@@ -1,5 +1,5 @@
 LIB=libjson.a
-CFLAGS ?= -Werror -Wall -Wformat=2
+CFLAGS ?= -Werror -Wall -Wformat=2 -ansi
 
 all: $(LIB) check
 

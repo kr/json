@@ -164,7 +164,7 @@ cttestparse()
 		assertf(r == v.n, "r is %d, exp %d", r, v.n);
 		for (j = 0; j < r; j++) {
 			JSON exp = v.parts[j], got = x[j];
-			assert(exp.len == strlen(exp.src)); // sanity check test data
+			assert(exp.len == strlen(exp.src)); /* sanity check test data */
 			assertf(got.type == exp.type, "part[%d].type = '%c' want '%c'", j, got.type, exp.type);
 			assertf(strncmp(got.src, exp.src, got.len) == 0, "part[%d].src = %.*s want %s", j, got.len, got.src, exp.src);
 			assertf(got.end == got.src + got.len, "part[%d]", j);

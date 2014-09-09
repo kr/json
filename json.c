@@ -95,10 +95,10 @@ static int
 parsestring(Parser *p, JSON *parent, JSON **prev)
 {
 	JSON *v = inititem(p, parent, prev, '"');
-	p->s++; // consume "
+	p->s++; /* consume " */
 	while (*p->s != '"') {
 		char c = *p->s;
-		must(c >= ' '); // no control chars
+		must(c >= ' '); /* no control chars */
 		p->s++;
 		if (c == '\\') {
 			switch (c = *p->s++) {
@@ -112,7 +112,7 @@ parsestring(Parser *p, JSON *parent, JSON **prev)
 			return 0;
 		}
 	}
-	p->s++; // consume "
+	p->s++; /* consume " */
 	if (v) {
 		v->end = p->s;
 	}
@@ -180,7 +180,7 @@ parseobject(Parser *p, JSON *parent, JSON **prev)
 	if (*p->s != '}') {
 		must(parsepair(p, v, &kprev, &vprev));
 		for (skipws(p); *p->s == ','; skipws(p)) {
-			p->s++; // consume ,
+			p->s++; /* consume , */
 			skipws(p);
 			must(parsepair(p, v, &kprev, &vprev));
 		}
@@ -203,7 +203,7 @@ parsearray(Parser *p, JSON *parent, JSON **prev)
 		JSON *aprev = nil;
 		must(parsevalue(p, v, &aprev));
 		for (skipws(p); *p->s == ','; skipws(p)) {
-			p->s++; // consume ,
+			p->s++; /* consume , */
 			skipws(p);
 			must(parsevalue(p, v, &aprev));
 		}
@@ -247,11 +247,6 @@ parsetext(Parser *p)
 }
 
 
-// Scans src and writes pointers to the lexical bounds of JSON values
-// to elements of part.
-//
-// Returns the total number of values in src, regardless of npart.
-// If src is not well-formed JSON, returns 0.
 int
 jsonparse(char *src, JSON *part, int npart)
 {
