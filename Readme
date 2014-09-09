@@ -25,6 +25,8 @@ JSON val[100];
 int n, i;
 
 n = jsonparse(src, val, 100);
+if (n == 0)
+	errx(1, "bad json");
 if (n > 100)
 	errx(1, "too many values");
 for (i=0; i<n; i++)
