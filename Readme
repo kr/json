@@ -44,7 +44,6 @@ int jsonparse(char *src, JSON *val, int nval);
 
 	Returns the total number of values in src (regardless of
 	nval). If src is not well-formed JSON, returns 0.
-	Ignores trailing garbage.
 
 typedef struct JSON JSON;
 struct JSON {
