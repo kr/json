@@ -232,27 +232,19 @@ parsevalue(Parser *p, JSON *parent, JSON **prev)
 }
 
 
-static int
-parsetext(Parser *p)
-{
-	JSON *prev = nil;
-	switch (*p->s) {
-	case '{': return parseobject(p, nil, &prev);
-	case '[': return parsearray(p, nil, &prev);
-	}
-	return 0;
-}
-
-
 int
 jsonparse(char *src, JSON *part, int npart)
 {
+	JSON *prev = nil;
 	Parser p = {};
 	p.s = src;
 	p.j = part;
 	p.nj = npart;
 	skipws(&p);
-	must(parsetext(&p));
+	if (*p.s != '{' && *p.s != '[') {
+		return 0; /* a "json text" must be an array or object */
+	}
+	must(parsevalue(&p, nil, &prev));
 	skipws(&p);
 	must(*p.s == '\0');
 	if (part) {
