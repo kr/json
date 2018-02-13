@@ -131,7 +131,8 @@ parsenumber(Parser *p, JSON *parent, JSON **prev)
 	c = *p->s;
 	if (c == '0') { /* special case, single 0 */
 		p->s++;
-	} else { /* p->s always starts with a digit */
+	} else {
+		must('1' <= *p->s && *p->s <= '9');
 		scandigits(p);
 	}
 	if (*p->s == '.') {

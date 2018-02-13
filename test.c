@@ -34,6 +34,8 @@ char *invalid[] = {
 	"{\"Illegal expression\": 1 + 2}",
 	"{\"Illegal invocation\": alert()}",
 	"{\"Numbers cannot have leading zeroes\": 013}",
+	"[.1]",  /* number must have leading digit */
+	"[-.1]", /* number must have leading digit */
 	"{\"Numbers cannot be hex\": 0x14}",
 	"[\"Illegal backslash escape: \\x15\"]",
 	"[\"Illegal backslash escape: \\'\"]",
