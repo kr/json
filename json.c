@@ -172,11 +172,11 @@ parsepair(Parser *p, JSON *parent, JSON **kprev, JSON **vprev)
 static int
 parseobject(Parser *p, JSON *parent, JSON **prev)
 {
-	JSON *kprev = nil, *vprev = nil;
 	JSON *v = inititem(p, parent, prev, '{');
 	must(consume(p, "{"));
 	skipws(p);
 	if (*p->s != '}') {
+		JSON *kprev = nil, *vprev = nil;
 		must(parsepair(p, v, &kprev, &vprev));
 		for (skipws(p); *p->s == ','; skipws(p)) {
 			p->s++; /* consume , */
