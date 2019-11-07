@@ -48,7 +48,8 @@ scandigits(Parser *p)
 static int
 scanhex4(Parser *p)
 {
-	for (int i = 0; i < 4; i++) {
+	int i;
+	for (i = 0; i < 4; i++) {
 		char c = *p->s++;
 		must(('0'<=c && c<='9') || ('a'<=c && c<='f') || ('A'<=c && c<='F'));
 	}
@@ -252,7 +253,8 @@ jsonparse(char *src, JSON *part, int npart)
 		if (p.n < npart) {
 			npart = p.n;
 		}
-		for (int i = 0; i < npart; i++) {
+		int i;
+		for (i = 0; i < npart; i++) {
 			part[i].len = part[i].end - part[i].src;
 		}
 	}
