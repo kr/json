@@ -64,22 +64,22 @@ static JSON *
 inititem(Parser *p, JSON *parent, JSON **prev, char type)
 {
 	p->n++;
-	if (p->nj > 0) {
-		JSON *v = p->j;
-		p->j++;
-		p->nj--;
-		v->type = type;
-		v->src = p->s;
-		v->parent = parent;
-		v->next = nil;
-		v->prev = *prev;
-		if (*prev) {
-			(*prev)->next = v;
-		}
-		*prev = v;
-		return v;
+	if (p->nj < 1) {
+		return nil;
 	}
-	return nil;
+	JSON *v = p->j;
+	p->j++;
+	p->nj--;
+	v->type = type;
+	v->src = p->s;
+	v->parent = parent;
+	v->next = nil;
+	v->prev = *prev;
+	if (*prev) {
+		(*prev)->next = v;
+	}
+	*prev = v;
+	return v;
 }
 
 
