@@ -36,12 +36,15 @@ skipws(Parser *p)
 }
 
 
-static void
+static int
 scandigits(Parser *p)
 {
+	int d = 0;
 	while ('0' <= *p->s && *p->s <= '9') {
 		p->s++;
+		d = 1;
 	}
+	return d;
 }
 
 
@@ -133,21 +136,18 @@ parsenumber(Parser *p, JSON *parent, JSON **prev)
 	if (c == '0') { /* special case, single 0 */
 		p->s++;
 	} else {
-		must('1' <= *p->s && *p->s <= '9');
-		scandigits(p);
+		must(scandigits(p));
 	}
 	if (*p->s == '.') {
 		p->s++;
-		must('0' <= *p->s && *p->s <= '9');
-		scandigits(p);
+		must(scandigits(p));
 	}
 	if (*p->s == 'e' || *p->s == 'E') {
 		p->s++;
 		if (*p->s == '+' || *p->s == '-') {
 			p->s++;
 		}
-		must('0' <= *p->s && *p->s <= '9');
-		scandigits(p);
+		must(scandigits(p));
 	}
 	if (v) {
 		v->end = p->s;
