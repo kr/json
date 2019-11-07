@@ -83,14 +83,21 @@ inititem(Parser *p, JSON *parent, JSON **prev, char type)
 }
 
 
+static void
+setend(Parser *p, JSON *v)
+{
+	if (v) {
+		v->end = p->s;
+	}
+}
+
+
 static int
 parseword(Parser *p, JSON *parent, JSON **prev, char *lit)
 {
 	JSON *v = inititem(p, parent, prev, lit[0]);
 	must(consume(p, lit));
-	if (v) {
-		v->end = p->s;
-	}
+	setend(p, v);
 	return 1;
 }
 
@@ -117,9 +124,7 @@ parsestring(Parser *p, JSON *parent, JSON **prev)
 		}
 	}
 	p->s++; /* consume " */
-	if (v) {
-		v->end = p->s;
-	}
+	setend(p, v);
 	return 1;
 }
 
@@ -149,9 +154,7 @@ parsenumber(Parser *p, JSON *parent, JSON **prev)
 		}
 		must(scandigits(p));
 	}
-	if (v) {
-		v->end = p->s;
-	}
+	setend(p, v);
 	return 1;
 }
 
@@ -185,9 +188,7 @@ parseobject(Parser *p, JSON *parent, JSON **prev)
 		}
 	}
 	must(consume(p, "}"));
-	if (v) {
-		v->end = p->s;
-	}
+	setend(p, v);
 	return 1;
 }
 
@@ -208,9 +209,7 @@ parsearray(Parser *p, JSON *parent, JSON **prev)
 		}
 	}
 	must(consume(p, "]"));
-	if (v) {
-		v->end = p->s;
-	}
+	setend(p, v);
 	return 1;
 }
 
