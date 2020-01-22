@@ -242,9 +242,8 @@ jsonparse(char *src, JSON *part, int npart)
 	p.j = part;
 	p.nj = npart;
 	skipws(&p);
-	if (*p.s != '{' && *p.s != '[') {
-		return 0; /* a "json text" must be an array or object */
-	}
+	/* a "json text" must be an array or object */
+	must(*p.s == '{' || *p.s == '[');
 	must(parsevalue(&p, nil, &prev));
 	skipws(&p);
 	must(*p.s == '\0');
