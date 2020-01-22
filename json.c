@@ -134,8 +134,8 @@ parsenumber(Parser *p, JSON *parent, JSON **prev)
 {
 	JSON *v = inititem(p, parent, prev, '0');
 	consume(p, "-"); /* optional */
-	if (*p->s == '0') { /* special case, single 0 */
-		p->s++;
+	if (*p->s == '0') {
+		p->s++; /* special case: single 0, no more digits allowed */
 	} else {
 		must(scandigits(p));
 	}
