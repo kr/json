@@ -2,8 +2,8 @@ libjson
 
 This is a C library for parsing the JSON[1] data format.
 This parser doesn't do very much; it really only parses.
-Doesn't do any converting or creating of higher-level data
-structures for you.
+It doesn't do any converting or creating of higher-level
+data structures for you.
 
 It has no dependencies. It only defines one type and one
 function. It does no allocation. Its source code is
