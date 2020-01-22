@@ -15,8 +15,17 @@ struct Parser {
 static int parsevalue(Parser*, JSON*, JSON**);
 
 
+static void
+skipws(Parser *p)
+{
+	while (*p->s == ' ' || *p->s == '\t' || *p->s == '\n' || *p->s == '\r') {
+		p->s++;
+	}
+}
+
+
 static int
-consume(Parser *p, char *s)
+scan(Parser *p, char *s)
 {
 	while (*s) {
 		must(*p->s == *s);
@@ -24,15 +33,6 @@ consume(Parser *p, char *s)
 		s++;
 	}
 	return 1;
-}
-
-
-static void
-skipws(Parser *p)
-{
-	while (*p->s == ' ' || *p->s == '\t' || *p->s == '\n' || *p->s == '\r') {
-		p->s++;
-	}
 }
 
 
@@ -96,7 +96,7 @@ static int
 parseword(Parser *p, JSON *parent, JSON **prev, char *lit)
 {
 	JSON *v = inititem(p, parent, prev, lit[0]);
-	must(consume(p, lit));
+	must(scan(p, lit));
 	setend(p, v);
 	return 1;
 }
@@ -106,7 +106,7 @@ static int
 parsestring(Parser *p, JSON *parent, JSON **prev)
 {
 	JSON *v = inititem(p, parent, prev, '"');
-	p->s++; /* consume " */
+	p->s++; /* scan " */
 	while (*p->s != '"') {
 		char c = *p->s;
 		must(c >= ' '); /* no control chars */
@@ -123,7 +123,7 @@ parsestring(Parser *p, JSON *parent, JSON **prev)
 			return 0;
 		}
 	}
-	p->s++; /* consume " */
+	p->s++; /* scan " */
 	setend(p, v);
 	return 1;
 }
@@ -133,7 +133,7 @@ static int
 parsenumber(Parser *p, JSON *parent, JSON **prev)
 {
 	JSON *v = inititem(p, parent, prev, '0');
-	consume(p, "-"); /* optional */
+	scan(p, "-"); /* optional */
 	if (*p->s == '0') {
 		p->s++; /* special case: single 0, no more digits allowed */
 	} else {
@@ -161,7 +161,7 @@ parsepair(Parser *p, JSON *parent, JSON **kprev, JSON **vprev)
 	must(*p->s == '"');
 	must(parsestring(p, parent, kprev));
 	skipws(p);
-	must(consume(p, ":"));
+	must(scan(p, ":"));
 	skipws(p);
 	must(parsevalue(p, parent, vprev));
 	return 1;
@@ -172,18 +172,18 @@ static int
 parseobject(Parser *p, JSON *parent, JSON **prev)
 {
 	JSON *v = inititem(p, parent, prev, '{');
-	must(consume(p, "{"));
+	must(scan(p, "{"));
 	skipws(p);
 	if (*p->s != '}') {
 		JSON *kprev = nil, *vprev = nil;
 		must(parsepair(p, v, &kprev, &vprev));
 		for (skipws(p); *p->s == ','; skipws(p)) {
-			p->s++; /* consume , */
+			p->s++; /* scan , */
 			skipws(p);
 			must(parsepair(p, v, &kprev, &vprev));
 		}
 	}
-	must(consume(p, "}"));
+	must(scan(p, "}"));
 	setend(p, v);
 	return 1;
 }
@@ -193,18 +193,18 @@ static int
 parsearray(Parser *p, JSON *parent, JSON **prev)
 {
 	JSON *v = inititem(p, parent, prev, '[');
-	must(consume(p, "["));
+	must(scan(p, "["));
 	skipws(p);
 	if (*p->s != ']') {
 		JSON *aprev = nil;
 		must(parsevalue(p, v, &aprev));
 		for (skipws(p); *p->s == ','; skipws(p)) {
-			p->s++; /* consume , */
+			p->s++; /* scan , */
 			skipws(p);
 			must(parsevalue(p, v, &aprev));
 		}
 	}
-	must(consume(p, "]"));
+	must(scan(p, "]"));
 	setend(p, v);
 	return 1;
 }
