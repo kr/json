@@ -112,7 +112,7 @@ parsestring(Parser *p, JSON *parent, JSON **prev)
 		must(c >= ' '); /* no control chars */
 		p->s++;
 		if (c == '\\') {
-			switch (c = *p->s++) {
+			switch (*p->s++) {
 			case 'b': case 'f': case 'n': case 'r':
 			case 't': case '"': case '\\': case '/':
 				continue;
