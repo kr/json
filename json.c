@@ -132,13 +132,11 @@ parsestring(Parser *p, JSON *parent, JSON **prev)
 static int
 parsenumber(Parser *p, JSON *parent, JSON **prev)
 {
-	char c;
 	JSON *v = inititem(p, parent, prev, '0');
 	if (*p->s == '-') {
 		p->s++;
 	}
-	c = *p->s;
-	if (c == '0') { /* special case, single 0 */
+	if (*p->s == '0') { /* special case, single 0 */
 		p->s++;
 	} else {
 		must(scandigits(p));
