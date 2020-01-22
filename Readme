@@ -7,7 +7,7 @@ structures for you.
 
 It has no dependencies. It only defines one type and one
 function. It does no allocation. Its source code is
-about 275 lines.
+about 250 lines.
 
 
 # Building
