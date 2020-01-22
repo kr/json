@@ -133,9 +133,7 @@ static int
 parsenumber(Parser *p, JSON *parent, JSON **prev)
 {
 	JSON *v = inititem(p, parent, prev, '0');
-	if (*p->s == '-') {
-		p->s++;
-	}
+	consume(p, "-"); /* optional */
 	if (*p->s == '0') { /* special case, single 0 */
 		p->s++;
 	} else {
