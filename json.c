@@ -48,18 +48,6 @@ scandigits(Parser *p)
 }
 
 
-static int
-scanhex4(Parser *p)
-{
-	int i;
-	for (i = 0; i < 4; i++) {
-		char c = *p->s++;
-		must(('0'<=c && c<='9') || ('a'<=c && c<='f') || ('A'<=c && c<='F'));
-	}
-	return 1;
-}
-
-
 static JSON *
 inititem(Parser *p, JSON *parent, JSON **prev, char type)
 {
@@ -117,7 +105,15 @@ parsestring(Parser *p, JSON *parent, JSON **prev)
 			case 't': case '"': case '\\': case '/':
 				continue;
 			case 'u':
-				must(scanhex4(p));
+				{
+					int i;
+					for (i = 0; i < 4; i++) {
+						char c = *p->s++;
+						must(('0'<=c && c<='9') ||
+								('a'<=c && c<='f') ||
+								('A'<=c && c<='F'));
+					}
+				}
 				continue;
 			}
 			return 0;
